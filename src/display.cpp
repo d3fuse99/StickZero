@@ -3,9 +3,9 @@
 MenuState currentMenu = MENU_MAIN;
 int selectedIndex = 0;
 
-const char* mainItems[] = {"[1] PC Remote", "[2] TV Remote", "[3] AC Remote"};
+const char* mainItems[] = {"[1] PC Remote", "[2] TV Remote", "[3] AC Remote", "[4] Snake Game", "[5] Wi-Fi Scan"};
 const char* pcItems[]   = {"1. PC Shutdown (BLE)", "2. PC Lock (BLE)", "< Back"};
-const char* tvItems[]   = {"1. All TVs Power", "2. Samsung / LG", "3. Sony", "< Back"};
+const char* tvItems[]   = {"1. TV-B-Gone (KIVI+All)", "2. Samsung / LG", "3. Sony", "< Back"};
 const char* acItems[]   = {"1. All ACs Power", "2. Cool Mode 24C", "< Back"};
 
 int getBatteryPercent() {
@@ -63,24 +63,24 @@ void renderUI() {
     int count = 0;
     const char** items = NULL;
 
-    if (currentMenu == MENU_MAIN) { count = 3; items = mainItems; }
+    if (currentMenu == MENU_MAIN) { count = 5; items = mainItems; }
     else if (currentMenu == MENU_PC) { count = 3; items = pcItems; }
     else if (currentMenu == MENU_TV) { count = 4; items = tvItems; }
     else if (currentMenu == MENU_AC) { count = 3; items = acItems; }
 
     for (int i = 0; i < count; i++) {
-        int y = 25 + (i * 22);
+        int y = 22 + (i * 19);
         if (i == selectedIndex) {
-            M5.Lcd.fillRect(0, y, 240, 20, DARKCYAN);
-            M5.Lcd.drawRect(0, y, 240, 20, CYAN);
+            M5.Lcd.fillRect(0, y, 240, 18, DARKCYAN);
+            M5.Lcd.drawRect(0, y, 240, 18, CYAN);
             M5.Lcd.setTextColor(YELLOW, DARKCYAN);
             M5.Lcd.setTextSize(2);
-            M5.Lcd.setCursor(5, y + 2);
-            M5.Lcd.printf("> %s", items[i]);
+            M5.Lcd.setCursor(2, y);
+            M5.Lcd.printf(">%s", items[i]);
         } else {
             M5.Lcd.setTextColor(WHITE, BLACK);
-            M5.Lcd.setTextSize(2);
-            M5.Lcd.setCursor(15, y + 2);
+            M5.Lcd.setTextSize(1);
+            M5.Lcd.setCursor(15, y + 4);
             M5.Lcd.println(items[i]);
         }
     }
