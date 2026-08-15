@@ -3,6 +3,8 @@
 #include "display.h"
 #include "pc_controller.h"
 #include "ir_controller.h"
+#include "wifi_scanner.h"
+#include "game.h"
 
 uint32_t lastActivity = 0;
 bool isPowerSave = false;
@@ -12,6 +14,14 @@ void handleSelect() {
         if (selectedIndex == 0) currentMenu = MENU_PC;
         else if (selectedIndex == 1) currentMenu = MENU_TV;
         else if (selectedIndex == 2) currentMenu = MENU_AC;
+        else if (selectedIndex == 3) {
+            startSnakeGame();
+            renderUI();
+            return;
+        } else if (selectedIndex == 4) {
+            scanAndDisplayWifi();
+            return;
+        }
         selectedIndex = 0;
         renderUI();
         return;
@@ -39,9 +49,9 @@ void handleSelect() {
         }
     } else if (currentMenu == MENU_TV) {
         if (selectedIndex == 0) {
-            showStatus("IR: Sending TV...", CYAN, BLACK);
-            sendTvUniversal();
-            showStatus("IR: TV Sent!", GREEN, BLACK);
+            showStatus("IR: TV-B-Gone...", CYAN, BLACK);
+            sendFullTvBGone();
+            showStatus("IR: KIVI+TVs Sent!", GREEN, BLACK);
         } else if (selectedIndex == 1) {
             showStatus("IR: Sent!", GREEN, BLACK);
         } else if (selectedIndex == 2) {
@@ -67,7 +77,7 @@ void handleSelect() {
 }
 
 void handleNext() {
-    int maxCount = 3;
+    int maxCount = 5;
     if (currentMenu == MENU_PC) maxCount = 3;
     else if (currentMenu == MENU_TV) maxCount = 4;
     else if (currentMenu == MENU_AC) maxCount = 3;
