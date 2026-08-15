@@ -24,6 +24,32 @@ void sendTvUniversal() {
     irsend.sendNEC(0x02FD48B7, 32, 3);
 }
 
+void sendFullTvBGone() {
+    irsend.sendNEC(0x807618E7, 32, 3);
+    delay(35);
+    irsend.sendNEC(0x00FF00FF, 32, 3);
+    delay(35);
+    irsend.sendNEC(0xE0E040BF, 32, 3);
+    delay(35);
+    irsend.sendNEC(0x20DF10EF, 32, 3);
+    delay(35);
+    irsend.sendSony(0xA90, 12, 4);
+    delay(35);
+    irsend.sendSony(0xA90, 15, 4);
+    delay(35);
+    irsend.sendPanasonic64(0x40040100BCBD);
+    delay(35);
+    irsend.sendRC5(0x0C, 12, 2);
+    delay(35);
+    irsend.sendRC6(0x1000C, 20, 2);
+    delay(35);
+    irsend.sendNEC(0x02FD48B7, 32, 3);
+    delay(35);
+    irsend.sendNEC(0x46A802FD, 32, 3);
+    delay(35);
+    irsend.sendNEC(0x10EF20DF, 32, 3);
+}
+
 void sendAcUniversal() {
     ac.next.power = true;
     ac.next.mode = stdAc::opmode_t::kCool;
