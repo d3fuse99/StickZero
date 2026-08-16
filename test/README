@@ -1,11 +1,43 @@
+**StickZero**
 
-This directory is intended for PlatformIO Test Runner and project tests.
+A modular multi-tool firmware for M5StickC PLUS powered by ESP32.
 
-Unit Testing is a software testing method by which individual units of
-source code, sets of one or more MCU program modules together with associated
-control data, usage procedures, and operating procedures, are tested to
-determine whether they are fit for use. Unit testing finds problems early
-in the development cycle.
+**Project Status: Release v3.3**
+Enhanced with Sensei AC support, Flashlight Mode, PC Audio Mute (BLE), Full TV-B-Gone (KIVI+All), Snake Game, and optimized power management.
 
-More information about PlatformIO Unit Testing:
-- https://docs.platformio.org/en/latest/advanced/unit-testing/index.html
+---
+
+**Features (v3.3)**
+* **Bruce-Style Multi-Window GUI**: Categorized submenu navigation (`PC Remote`, `TV Remote`, `AC Remote`, `Flashlight`, `Snake Game`) with real-time battery percentage indicator (AXP192).
+* **Language-Independent PC Control**: Hardware-level Windows 10/11 shutdown (`Win+X` -> `u` -> `u`), screen lock (`Win+L`), and audio mute (`KEY_MEDIA_MUTE`) via Bluetooth HID.
+* **Full TV-B-Gone & KIVI Support**: Comprehensive IR power-toggle burst for KIVI, Samsung, LG, Sony, Panasonic, Philips, Toshiba, and TCL TVs.
+* **Sensei & Universal AC Remote**: Dedicated payload generator for Sensei AC units alongside major climate brands (Gree, Coolix, Midea, Daikin, Haier, LG, Samsung, Panasonic, Mitsubishi).
+* **Pocket Flashlight Mode**: Full-screen 100% white display brightness paired with on-board red LED (GPIO 10) illumination.
+* **Retro Snake Game**: Interactive mini-game designed for the 240x135 LCD with score tracking.
+* **Deep Power Saver**: Display backlight power rail (`LDO2`) completely shuts off after 10 seconds of inactivity to preserve battery life.
+
+---
+
+**Hardware Requirements**
+* **Target Board**: M5StickC PLUS (ESP32-PICO-D4, ST7789 display 135x240 px).
+
+---
+
+**Project Structure**
+* `include/display.h` / `src/display.cpp` — GUI rendering, menu state machine, flashlight, battery metering.
+* `include/pc_controller.h` / `src/pc_controller.cpp` — Bluetooth HID shortcuts (Shutdown, Lock, Mute).
+* `include/ir_controller.h` / `src/ir_controller.cpp` — TV (KIVI, Samsung, LG, Sony) and AC (Sensei, Universal) IR drivers.
+* `include/game.h` / `src/game.cpp` — Built-in Snake game engine.
+* `src/main.cpp` — Event loop & hardware orchestration.
+
+---
+
+**Build & Installation**
+1. Open workspace in **VS Code** with **PlatformIO** extension.
+2. Build & Upload:
+   `pio run --target upload`
+
+---
+
+**License**
+Licensed under the [MIT License](LICENSE).
