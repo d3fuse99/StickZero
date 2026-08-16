@@ -3,7 +3,6 @@
 #include "display.h"
 #include "pc_controller.h"
 #include "ir_controller.h"
-#include "wifi_scanner.h"
 #include "game.h"
 
 uint32_t lastActivity = 0;
@@ -15,11 +14,11 @@ void handleSelect() {
         else if (selectedIndex == 1) currentMenu = MENU_TV;
         else if (selectedIndex == 2) currentMenu = MENU_AC;
         else if (selectedIndex == 3) {
-            startSnakeGame();
-            renderUI();
+            startFlashlight();
             return;
         } else if (selectedIndex == 4) {
-            scanAndDisplayWifi();
+            startSnakeGame();
+            renderUI();
             return;
         }
         selectedIndex = 0;
@@ -43,6 +42,13 @@ void handleSelect() {
                 showStatus("BLE: Disconnected!", RED, WHITE);
             }
         } else if (selectedIndex == 2) {
+            if (bleKeyboard.isConnected()) {
+                pcMuteAudio();
+                showStatus("BLE: Mute Toggled!", GREEN, BLACK);
+            } else {
+                showStatus("BLE: Disconnected!", RED, WHITE);
+            }
+        } else if (selectedIndex == 3) {
             currentMenu = MENU_MAIN;
             selectedIndex = 0;
             renderUI();
@@ -63,12 +69,16 @@ void handleSelect() {
         }
     } else if (currentMenu == MENU_AC) {
         if (selectedIndex == 0) {
+            showStatus("IR: Sensei AC...", CYAN, BLACK);
+            sendSenseiAcPower();
+            showStatus("IR: Sensei Sent!", GREEN, BLACK);
+        } else if (selectedIndex == 1) {
             showStatus("IR: Sending AC...", CYAN, BLACK);
             sendAcUniversal();
             showStatus("IR: AC Sent!", GREEN, BLACK);
-        } else if (selectedIndex == 1) {
-            showStatus("IR: AC 24C Sent!", GREEN, BLACK);
         } else if (selectedIndex == 2) {
+            showStatus("IR: AC 24C Sent!", GREEN, BLACK);
+        } else if (selectedIndex == 3) {
             currentMenu = MENU_MAIN;
             selectedIndex = 0;
             renderUI();
@@ -78,9 +88,9 @@ void handleSelect() {
 
 void handleNext() {
     int maxCount = 5;
-    if (currentMenu == MENU_PC) maxCount = 3;
+    if (currentMenu == MENU_PC) maxCount = 4;
     else if (currentMenu == MENU_TV) maxCount = 4;
-    else if (currentMenu == MENU_AC) maxCount = 3;
+    else if (currentMenu == MENU_AC) maxCount = 4;
 
     selectedIndex = (selectedIndex + 1) % maxCount;
     renderUI();
