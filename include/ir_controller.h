@@ -8,3 +8,4 @@ void initIrController();
 void sendTvUniversal();
 void sendAcUniversal();
 void sendFullTvBGone();
+void sendSenseiAcPower();
