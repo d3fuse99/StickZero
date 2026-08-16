@@ -26,3 +26,8 @@ void pcLockScreen() {
     delay(100);
     bleKeyboard.releaseAll();
 }
+
+void pcMuteAudio() {
+    if (!bleKeyboard.isConnected()) return;
+    bleKeyboard.write(KEY_MEDIA_MUTE);
+}
