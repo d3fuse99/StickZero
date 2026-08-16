@@ -8,6 +8,18 @@ void initIrController() {
     irsend.begin();
 }
 
+void sendSenseiAcPower() {
+    ac.next.protocol = decode_type_t::COOLIX;
+    ac.next.power = true;
+    ac.next.mode = stdAc::opmode_t::kCool;
+    ac.next.degrees = 24;
+    ac.sendAc();
+    delay(60);
+
+    ac.next.protocol = decode_type_t::GREE;
+    ac.sendAc();
+}
+
 void sendTvUniversal() {
     irsend.sendNEC(0xE0E040BF, 32, 3);
     delay(30);
