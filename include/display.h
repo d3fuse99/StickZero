@@ -17,4 +17,3 @@ void showLoadingAnimation(const char* title);
 void showStatus(const char* msg, uint16_t bgColor, uint16_t fgColor);
 int getBatteryPercent();
 void setPowerSave(bool enable);
-void startFlashlight();
