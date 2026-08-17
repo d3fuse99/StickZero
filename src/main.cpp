@@ -3,6 +3,9 @@
 #include "display.h"
 #include "pc_controller.h"
 #include "ir_controller.h"
+#include "radar.h"
+#include "imu_level.h"
+#include "flashlight.h"
 #include "game.h"
 
 uint32_t lastActivity = 0;
@@ -14,9 +17,18 @@ void handleSelect() {
         else if (selectedIndex == 1) currentMenu = MENU_TV;
         else if (selectedIndex == 2) currentMenu = MENU_AC;
         else if (selectedIndex == 3) {
-            startFlashlight();
+            startBleRadar();
+            renderUI();
             return;
         } else if (selectedIndex == 4) {
+            startBubbleLevel();
+            renderUI();
+            return;
+        } else if (selectedIndex == 5) {
+            startFlashlightMenu();
+            renderUI();
+            return;
+        } else if (selectedIndex == 6) {
             startSnakeGame();
             renderUI();
             return;
@@ -87,7 +99,7 @@ void handleSelect() {
 }
 
 void handleNext() {
-    int maxCount = 5;
+    int maxCount = 7;
     if (currentMenu == MENU_PC) maxCount = 4;
     else if (currentMenu == MENU_TV) maxCount = 4;
     else if (currentMenu == MENU_AC) maxCount = 4;
