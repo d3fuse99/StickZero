@@ -1,5 +1,4 @@
 #include <M5StickCPlus.h>
-#include <WiFi.h>
 #include "display.h"
 #include "pc_controller.h"
 #include "ir_controller.h"
@@ -14,8 +13,12 @@ bool isPowerSave = false;
 void handleSelect() {
     if (currentMenu == MENU_MAIN) {
         if (selectedIndex == 0) currentMenu = MENU_PC;
-        else if (selectedIndex == 1) currentMenu = MENU_TV;
-        else if (selectedIndex == 2) currentMenu = MENU_AC;
+        else if (selectedIndex == 1) {
+            showStatus("IR: TV-B-Gone...", CYAN, BLACK);
+            sendFullTvBGone();
+            showStatus("IR: All TVs Sent!", GREEN, BLACK);
+            return;
+        } else if (selectedIndex == 2) currentMenu = MENU_AC;
         else if (selectedIndex == 3) {
             startBleRadar();
             renderUI();
@@ -25,7 +28,7 @@ void handleSelect() {
             renderUI();
             return;
         } else if (selectedIndex == 5) {
-            startFlashlightMenu();
+            startDirectFlashlight();
             renderUI();
             return;
         } else if (selectedIndex == 6) {
@@ -65,20 +68,6 @@ void handleSelect() {
             selectedIndex = 0;
             renderUI();
         }
-    } else if (currentMenu == MENU_TV) {
-        if (selectedIndex == 0) {
-            showStatus("IR: TV-B-Gone...", CYAN, BLACK);
-            sendFullTvBGone();
-            showStatus("IR: KIVI+TVs Sent!", GREEN, BLACK);
-        } else if (selectedIndex == 1) {
-            showStatus("IR: Sent!", GREEN, BLACK);
-        } else if (selectedIndex == 2) {
-            showStatus("IR: Sony Sent!", GREEN, BLACK);
-        } else if (selectedIndex == 3) {
-            currentMenu = MENU_MAIN;
-            selectedIndex = 0;
-            renderUI();
-        }
     } else if (currentMenu == MENU_AC) {
         if (selectedIndex == 0) {
             showStatus("IR: Sensei AC...", CYAN, BLACK);
@@ -89,8 +78,6 @@ void handleSelect() {
             sendAcUniversal();
             showStatus("IR: AC Sent!", GREEN, BLACK);
         } else if (selectedIndex == 2) {
-            showStatus("IR: AC 24C Sent!", GREEN, BLACK);
-        } else if (selectedIndex == 3) {
             currentMenu = MENU_MAIN;
             selectedIndex = 0;
             renderUI();
@@ -101,8 +88,7 @@ void handleSelect() {
 void handleNext() {
     int maxCount = 7;
     if (currentMenu == MENU_PC) maxCount = 4;
-    else if (currentMenu == MENU_TV) maxCount = 4;
-    else if (currentMenu == MENU_AC) maxCount = 4;
+    else if (currentMenu == MENU_AC) maxCount = 3;
 
     selectedIndex = (selectedIndex + 1) % maxCount;
     renderUI();
@@ -120,7 +106,6 @@ void resetSleepTimer() {
 void setup() {
     setCpuFrequencyMhz(80);
     M5.begin();
-    WiFi.mode(WIFI_OFF);
 
     initDisplay();
     showLoadingAnimation("StickZero OS...");

@@ -4,7 +4,6 @@
 enum MenuState {
     MENU_MAIN,
     MENU_PC,
-    MENU_TV,
     MENU_AC
 };
 
