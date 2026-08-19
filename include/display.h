@@ -3,8 +3,7 @@
 
 enum MenuState {
     MENU_MAIN,
-    MENU_PC,
-    MENU_AC
+    MENU_PC
 };
 
 extern MenuState currentMenu;
