@@ -3,9 +3,8 @@
 MenuState currentMenu = MENU_MAIN;
 int selectedIndex = 0;
 
-const char* mainItems[] = {"[1] PC Remote", "[2] TV-B-Gone (All)", "[3] AC Remote", "[4] BLE Radar", "[5] IMU Level", "[6] Flashlight", "[7] Snake Game"};
+const char* mainItems[] = {"[1] PC Remote", "[2] TV-B-Gone (All)", "[3] AC-B-Gone (All)", "[4] Cyber Bober", "[5] BLE Radar", "[6] IMU Level", "[7] Flashlight", "[8] Snake Game"};
 const char* pcItems[]   = {"1. PC Shutdown (BLE)", "2. PC Lock (BLE)", "3. Mute Audio (BLE)", "< Back"};
-const char* acItems[]   = {"1. Sensei AC Power", "2. All ACs Power", "< Back"};
 
 int getBatteryPercent() {
     float vbat = M5.Axp.GetBatVoltage();
@@ -37,9 +36,9 @@ void showLoadingAnimation(const char* title) {
     M5.Lcd.println(title);
 
     M5.Lcd.drawRect(20, 75, 200, 16, WHITE);
-    for (int i = 0; i <= 196; i += 14) {
+    for (int i = 0; i <= 196; i += 28) {
         M5.Lcd.fillRect(22, 77, i, 12, GREEN);
-        delay(20);
+        delay(15);
     }
 }
 
@@ -51,9 +50,8 @@ void renderUI() {
     M5.Lcd.setTextSize(1);
     M5.Lcd.setCursor(5, 5);
 
-    if (currentMenu == MENU_MAIN) M5.Lcd.print("StickZero OS v4.1");
+    if (currentMenu == MENU_MAIN) M5.Lcd.print("StickZero OS v4.2");
     else if (currentMenu == MENU_PC) M5.Lcd.print("StickZero > PC");
-    else if (currentMenu == MENU_AC) M5.Lcd.print("StickZero > AC");
 
     M5.Lcd.setCursor(170, 5);
     M5.Lcd.printf("BAT:%d%%", getBatteryPercent());
@@ -61,9 +59,8 @@ void renderUI() {
     int count = 0;
     const char** items = NULL;
 
-    if (currentMenu == MENU_MAIN) { count = 7; items = mainItems; }
+    if (currentMenu == MENU_MAIN) { count = 8; items = mainItems; }
     else if (currentMenu == MENU_PC) { count = 4; items = pcItems; }
-    else if (currentMenu == MENU_AC) { count = 3; items = acItems; }
 
     int startIdx = 0;
     if (count > 5 && selectedIndex >= 5) startIdx = selectedIndex - 4;
