@@ -2,6 +2,7 @@
 #include "display.h"
 #include "pc_controller.h"
 #include "ir_controller.h"
+#include "beaver.h"
 #include "radar.h"
 #include "imu_level.h"
 #include "flashlight.h"
@@ -18,20 +19,29 @@ void handleSelect() {
             sendFullTvBGone();
             showStatus("IR: All TVs Sent!", GREEN, BLACK);
             return;
-        } else if (selectedIndex == 2) currentMenu = MENU_AC;
-        else if (selectedIndex == 3) {
-            startBleRadar();
+        } else if (selectedIndex == 2) {
+            showStatus("IR: AC-B-Gone...", CYAN, BLACK);
+            sendSenseiAcPower();
+            sendAcUniversal();
+            showStatus("IR: All ACs Sent!", GREEN, BLACK);
+            return;
+        } else if (selectedIndex == 3) {
+            startBeaverCompanion();
             renderUI();
             return;
         } else if (selectedIndex == 4) {
-            startBubbleLevel();
+            startBleRadar();
             renderUI();
             return;
         } else if (selectedIndex == 5) {
-            startDirectFlashlight();
+            startBubbleLevel();
             renderUI();
             return;
         } else if (selectedIndex == 6) {
+            startDirectFlashlight();
+            renderUI();
+            return;
+        } else if (selectedIndex == 7) {
             startSnakeGame();
             renderUI();
             return;
@@ -68,27 +78,12 @@ void handleSelect() {
             selectedIndex = 0;
             renderUI();
         }
-    } else if (currentMenu == MENU_AC) {
-        if (selectedIndex == 0) {
-            showStatus("IR: Sensei AC...", CYAN, BLACK);
-            sendSenseiAcPower();
-            showStatus("IR: Sensei Sent!", GREEN, BLACK);
-        } else if (selectedIndex == 1) {
-            showStatus("IR: Sending AC...", CYAN, BLACK);
-            sendAcUniversal();
-            showStatus("IR: AC Sent!", GREEN, BLACK);
-        } else if (selectedIndex == 2) {
-            currentMenu = MENU_MAIN;
-            selectedIndex = 0;
-            renderUI();
-        }
     }
 }
 
 void handleNext() {
-    int maxCount = 7;
+    int maxCount = 8;
     if (currentMenu == MENU_PC) maxCount = 4;
-    else if (currentMenu == MENU_AC) maxCount = 3;
 
     selectedIndex = (selectedIndex + 1) % maxCount;
     renderUI();
