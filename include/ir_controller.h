@@ -1,11 +1,10 @@
 #pragma once
+#include <Arduino.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
-#include <IRac.h>
 
 extern IRsend irsend;
 void initIrController();
-void sendTvUniversal();
-void sendAcUniversal();
 void sendFullTvBGone();
 void sendSenseiAcPower();
+void sendAcUniversal();
