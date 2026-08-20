@@ -11,82 +11,74 @@
 uint32_t lastActivity = 0;
 bool isPowerSave = false;
 
-void handleSelect() {
-    if (currentMenu == MENU_MAIN) {
-        if (selectedIndex == 0) currentMenu = MENU_PC;
-        else if (selectedIndex == 1) {
+void handleCarouselSelect() {
+    switch (currentAppIndex) {
+        case 0:
+            currentMenu = MENU_PC;
+            selectedIndex = 0;
+            renderPcMenuUI();
+            break;
+        case 1:
             showStatus("IR: TV-B-Gone...", CYAN, BLACK);
             sendFullTvBGone();
             showStatus("IR: All TVs Sent!", GREEN, BLACK);
-            return;
-        } else if (selectedIndex == 2) {
+            renderCarouselUI();
+            break;
+        case 2:
             showStatus("IR: AC-B-Gone...", CYAN, BLACK);
             sendSenseiAcPower();
             sendAcUniversal();
             showStatus("IR: All ACs Sent!", GREEN, BLACK);
-            return;
-        } else if (selectedIndex == 3) {
-            startBeaverCompanion();
-            renderUI();
-            return;
-        } else if (selectedIndex == 4) {
+            renderCarouselUI();
+            break;
+        case 3:
             startBleRadar();
-            renderUI();
-            return;
-        } else if (selectedIndex == 5) {
+            renderCarouselUI();
+            break;
+        case 4:
             startBubbleLevel();
-            renderUI();
-            return;
-        } else if (selectedIndex == 6) {
+            renderCarouselUI();
+            break;
+        case 5:
             startDirectFlashlight();
-            renderUI();
-            return;
-        } else if (selectedIndex == 7) {
+            renderCarouselUI();
+            break;
+        case 6:
             startSnakeGame();
-            renderUI();
-            return;
-        }
-        selectedIndex = 0;
-        renderUI();
-        return;
-    }
-
-    if (currentMenu == MENU_PC) {
-        if (selectedIndex == 0) {
-            if (bleKeyboard.isConnected()) {
-                pcShutdownBle();
-                showStatus("BLE: Shutdown Sent!", RED, WHITE);
-            } else {
-                showStatus("BLE: Disconnected!", RED, WHITE);
-            }
-        } else if (selectedIndex == 1) {
-            if (bleKeyboard.isConnected()) {
-                pcLockScreen();
-                showStatus("BLE: Screen Locked!", YELLOW, BLACK);
-            } else {
-                showStatus("BLE: Disconnected!", RED, WHITE);
-            }
-        } else if (selectedIndex == 2) {
-            if (bleKeyboard.isConnected()) {
-                pcMuteAudio();
-                showStatus("BLE: Mute Toggled!", GREEN, BLACK);
-            } else {
-                showStatus("BLE: Disconnected!", RED, WHITE);
-            }
-        } else if (selectedIndex == 3) {
-            currentMenu = MENU_MAIN;
-            selectedIndex = 0;
-            renderUI();
-        }
+            renderCarouselUI();
+            break;
     }
 }
 
-void handleNext() {
-    int maxCount = 8;
-    if (currentMenu == MENU_PC) maxCount = 4;
-
-    selectedIndex = (selectedIndex + 1) % maxCount;
-    renderUI();
+void handlePcMenuSelect() {
+    if (selectedIndex == 0) {
+        if (bleKeyboard.isConnected()) {
+            pcShutdownBle();
+            showStatus("BLE: Shutdown Sent!", RED, WHITE);
+        } else {
+            showStatus("BLE: Disconnected!", RED, WHITE);
+        }
+        renderPcMenuUI();
+    } else if (selectedIndex == 1) {
+        if (bleKeyboard.isConnected()) {
+            pcLockScreen();
+            showStatus("BLE: Screen Locked!", YELLOW, BLACK);
+        } else {
+            showStatus("BLE: Disconnected!", RED, WHITE);
+        }
+        renderPcMenuUI();
+    } else if (selectedIndex == 2) {
+        if (bleKeyboard.isConnected()) {
+            pcMuteAudio();
+            showStatus("BLE: Mute Toggled!", GREEN, BLACK);
+        } else {
+            showStatus("BLE: Disconnected!", RED, WHITE);
+        }
+        renderPcMenuUI();
+    } else if (selectedIndex == 3) {
+        currentMenu = MENU_CAROUSEL;
+        renderCarouselUI();
+    }
 }
 
 void resetSleepTimer() {
@@ -94,7 +86,8 @@ void resetSleepTimer() {
     if (isPowerSave) {
         setPowerSave(false);
         isPowerSave = false;
-        renderUI();
+        if (currentMenu == MENU_CAROUSEL) renderCarouselUI();
+        else renderPcMenuUI();
     }
 }
 
@@ -103,13 +96,17 @@ void setup() {
     M5.begin();
 
     initDisplay();
-    showLoadingAnimation("StickZero OS...");
+    showCyberBeaverBoot();
+
+    while (!checkPinLock()) {
+        delay(100);
+    }
 
     initIrController();
     initPcController();
 
     lastActivity = millis();
-    renderUI();
+    renderCarouselUI();
 }
 
 void loop() {
@@ -125,7 +122,13 @@ void loop() {
             resetSleepTimer();
         } else {
             resetSleepTimer();
-            handleNext();
+            if (currentMenu == MENU_CAROUSEL) {
+                currentAppIndex = (currentAppIndex + 1) % 7;
+                renderCarouselUI();
+            } else {
+                selectedIndex = (selectedIndex + 1) % 4;
+                renderPcMenuUI();
+            }
         }
     }
 
@@ -134,7 +137,11 @@ void loop() {
             resetSleepTimer();
         } else {
             resetSleepTimer();
-            handleSelect();
+            if (currentMenu == MENU_CAROUSEL) {
+                handleCarouselSelect();
+            } else {
+                handlePcMenuSelect();
+            }
         }
     }
 
