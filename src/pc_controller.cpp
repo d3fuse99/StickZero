@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "pc_controller.h"
 
 BleKeyboard bleKeyboard("StickZero OS", "M5Stack", 100);
