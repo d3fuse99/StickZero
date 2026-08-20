@@ -1,4 +1,4 @@
 #pragma once
 #include <M5StickCPlus.h>
 
-void startBeaverCompanion();
+void showCyberBeaverBoot();
