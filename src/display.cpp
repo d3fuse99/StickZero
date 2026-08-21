@@ -34,72 +34,98 @@ void setPowerSave(bool enable) {
         M5.Axp.SetLDO2(false);
     } else {
         M5.Axp.SetLDO2(true);
-        M5.Axp.ScreenBreath(25);
+        M5.Axp.ScreenBreath(18);
     }
 }
 
 void initDisplay() {
     M5.Lcd.setRotation(3);
     M5.Axp.SetLDO2(true);
-    M5.Axp.ScreenBreath(25);
+    M5.Axp.ScreenBreath(18);
+}
+
+void shuffleArray(int* arr, int n) {
+    for (int i = n - 1; i > 0; i--) {
+        int j = random(0, i + 1);
+        int t = arr[i];
+        arr[i] = arr[j];
+        arr[j] = t;
+    }
 }
 
 bool checkPinLock() {
-    int pin[4] = {0, 0, 0, 0};
-    int targetPin[4] = {1, 3, 3, 7};
-    int currentDigit = 0;
+    int targetPin[4] = {7, 9, 2, 4};
+    int enteredPin[4] = {0, 0, 0, 0};
+    int gridNumbers[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-    M5.Lcd.fillScreen(BLACK);
+    randomSeed(millis());
+    shuffleArray(gridNumbers, 10);
 
-    while (currentDigit < 4) {
-        M5.Lcd.fillRect(0, 0, 240, 20, NAVY);
+    int cursorIndex = 0;
+    int step = 0;
+
+    int gridX[10] = {105, 150, 195, 105, 150, 195, 105, 150, 195, 150};
+    int gridY[10] = {  8,   8,   8,  38,  38,  38,  68,  68,  68,  98};
+
+    while (step < 4) {
+        M5.Lcd.fillScreen(BLACK);
+
+        M5.Lcd.fillRect(0, 0, 95, 135, NAVY);
         M5.Lcd.setTextColor(WHITE, NAVY);
         M5.Lcd.setTextSize(1);
-        M5.Lcd.setCursor(5, 6);
-        M5.Lcd.print("SECURITY LOCK | Enter PIN");
-
-        M5.Lcd.fillRect(0, 25, 240, 75, BLACK);
+        M5.Lcd.setCursor(6, 12);
+        M5.Lcd.println("SECURITY");
+        M5.Lcd.setCursor(6, 24);
+        M5.Lcd.println("KEYPAD");
 
         for (int i = 0; i < 4; i++) {
-            int x = 45 + (i * 40);
-            if (i == currentDigit) {
-                M5.Lcd.fillRect(x, 40, 30, 40, DARKCYAN);
-                M5.Lcd.drawRect(x, 40, 30, 40, CYAN);
-                M5.Lcd.setTextColor(YELLOW, DARKCYAN);
-                M5.Lcd.setTextSize(3);
-                M5.Lcd.setCursor(x + 7, 48);
-                M5.Lcd.print(pin[i]);
-            } else if (i < currentDigit) {
-                M5.Lcd.fillRect(x, 40, 30, 40, DARKGREY);
-                M5.Lcd.drawRect(x, 40, 30, 40, WHITE);
-                M5.Lcd.setTextColor(GREEN, DARKGREY);
-                M5.Lcd.setTextSize(3);
-                M5.Lcd.setCursor(x + 7, 48);
-                M5.Lcd.print("*");
+            int dotX = 14 + (i * 18);
+            if (i < step) {
+                M5.Lcd.fillCircle(dotX, 55, 5, GREEN);
             } else {
-                M5.Lcd.drawRect(x, 40, 30, 40, DARKGREY);
-                M5.Lcd.setTextColor(DARKGREY, BLACK);
-                M5.Lcd.setTextSize(3);
-                M5.Lcd.setCursor(x + 7, 48);
-                M5.Lcd.print("-");
+                M5.Lcd.drawCircle(dotX, 55, 5, WHITE);
             }
         }
 
-        M5.Lcd.fillRect(0, 115, 240, 20, BLACK);
-        M5.Lcd.drawFastHLine(0, 114, 240, DARKCYAN);
-        M5.Lcd.setTextColor(WHITE, BLACK);
+        M5.Lcd.setTextColor(CYAN, NAVY);
         M5.Lcd.setTextSize(1);
-        M5.Lcd.setCursor(15, 120);
-        M5.Lcd.println("[B] Change Digit (0-9)  [A] Confirm");
+        M5.Lcd.setCursor(6, 80);
+        M5.Lcd.println("[B] Move");
+        M5.Lcd.setCursor(6, 95);
+        M5.Lcd.println("[A] Enter");
+        M5.Lcd.setCursor(6, 115);
+        M5.Lcd.printf("BAT:%d%%", getBatteryPercent());
+
+        for (int i = 0; i < 10; i++) {
+            int x = gridX[i];
+            int y = gridY[i];
+            int val = gridNumbers[i];
+
+            if (i == cursorIndex) {
+                M5.Lcd.fillRoundRect(x, y, 38, 26, 6, YELLOW);
+                M5.Lcd.setTextColor(BLACK, YELLOW);
+                M5.Lcd.setTextSize(2);
+                M5.Lcd.setCursor(x + 13, y + 5);
+                M5.Lcd.print(val);
+            } else {
+                M5.Lcd.fillRoundRect(x, y, 38, 26, 6, DARKCYAN);
+                M5.Lcd.drawRoundRect(x, y, 38, 26, 6, CYAN);
+                M5.Lcd.setTextColor(WHITE, DARKCYAN);
+                M5.Lcd.setTextSize(2);
+                M5.Lcd.setCursor(x + 13, y + 5);
+                M5.Lcd.print(val);
+            }
+        }
 
         while (true) {
             M5.update();
             if (M5.BtnB.wasPressed()) {
-                pin[currentDigit] = (pin[currentDigit] + 1) % 10;
+                cursorIndex = (cursorIndex + 1) % 10;
                 break;
             }
             if (M5.BtnA.wasPressed()) {
-                currentDigit++;
+                enteredPin[step] = gridNumbers[cursorIndex];
+                step++;
                 break;
             }
             delay(30);
@@ -108,7 +134,7 @@ bool checkPinLock() {
 
     bool matched = true;
     for (int i = 0; i < 4; i++) {
-        if (pin[i] != targetPin[i]) matched = false;
+        if (enteredPin[i] != targetPin[i]) matched = false;
     }
 
     if (matched) {
@@ -117,7 +143,7 @@ bool checkPinLock() {
         M5.Lcd.setTextSize(2);
         M5.Lcd.setCursor(35, 55);
         M5.Lcd.println("ACCESS GRANTED");
-        delay(600);
+        delay(500);
         return true;
     } else {
         M5.Lcd.fillScreen(RED);
@@ -133,45 +159,71 @@ bool checkPinLock() {
 void drawAppIcon(int x, int y, int index) {
     switch (index) {
         case 0:
-            M5.Lcd.drawRect(x + 8, y + 4, 32, 22, CYAN);
-            M5.Lcd.fillRect(x + 12, y + 8, 24, 14, NAVY);
-            M5.Lcd.drawFastHLine(x + 4, y + 26, 40, CYAN);
+            M5.Lcd.drawRect(x + 6, y + 2, 36, 22, CYAN);
+            M5.Lcd.fillRect(x + 9, y + 5, 30, 16, BLACK);
+            M5.Lcd.drawFastHLine(x + 12, y + 9, 14, GREEN);
+            M5.Lcd.drawFastHLine(x + 12, y + 13, 20, CYAN);
+            M5.Lcd.drawFastHLine(x + 12, y + 17, 10, YELLOW);
+            M5.Lcd.fillRect(x + 2, y + 24, 44, 4, DARKGREY);
+            M5.Lcd.drawRect(x + 2, y + 24, 44, 4, WHITE);
+            M5.Lcd.drawFastHLine(x + 18, y + 25, 12, CYAN);
             break;
         case 1:
-            M5.Lcd.drawRect(x + 8, y + 6, 32, 22, RED);
-            M5.Lcd.drawLine(x + 16, y + 2, x + 24, y + 6, YELLOW);
-            M5.Lcd.drawLine(x + 32, y + 2, x + 24, y + 6, YELLOW);
-            M5.Lcd.drawCircle(x + 24, y + 17, 4, WHITE);
+            M5.Lcd.drawRect(x + 4, y + 6, 40, 24, 0x8A22);
+            M5.Lcd.fillRect(x + 7, y + 9, 26, 18, BLACK);
+            M5.Lcd.drawCircle(x + 20, y + 18, 5, CYAN);
+            M5.Lcd.drawCircle(x + 38, y + 12, 2, WHITE);
+            M5.Lcd.drawCircle(x + 38, y + 20, 2, WHITE);
+            M5.Lcd.drawLine(x + 14, y + 1, x + 24, y + 6, YELLOW);
+            M5.Lcd.drawLine(x + 34, y + 1, x + 24, y + 6, YELLOW);
+            M5.Lcd.drawCircle(x + 14, y + 1, 1, RED);
+            M5.Lcd.drawCircle(x + 34, y + 1, 1, RED);
             break;
         case 2:
-            M5.Lcd.drawFastHLine(x + 6, y + 16, 36, CYAN);
-            M5.Lcd.drawFastVLine(x + 24, y + 4, 24, CYAN);
-            M5.Lcd.drawLine(x + 10, y + 8, x + 38, y + 24, CYAN);
-            M5.Lcd.drawLine(x + 10, y + 24, x + 38, y + 8, CYAN);
+            M5.Lcd.drawRect(x + 2, y + 6, 44, 18, WHITE);
+            M5.Lcd.fillRect(x + 5, y + 9, 38, 12, DARKGREY);
+            M5.Lcd.drawFastHLine(x + 6, y + 19, 36, CYAN);
+            M5.Lcd.drawFastHLine(x + 8, y + 22, 32, CYAN);
+            M5.Lcd.fillCircle(x + 40, y + 11, 2, GREEN);
+            M5.Lcd.drawFastHLine(x + 16, y + 28, 16, 0x5DFF);
+            M5.Lcd.drawFastHLine(x + 12, y + 32, 24, 0x5DFF);
             break;
         case 3:
-            M5.Lcd.drawCircle(x + 24, y + 16, 14, GREEN);
-            M5.Lcd.drawCircle(x + 24, y + 16, 7, GREEN);
-            M5.Lcd.drawFastHLine(x + 6, y + 16, 36, DARKGREEN);
-            M5.Lcd.drawFastVLine(x + 24, y + 2, 28, DARKGREEN);
+            M5.Lcd.drawCircle(x + 24, y + 17, 16, DARKGREEN);
+            M5.Lcd.drawCircle(x + 24, y + 17, 10, GREEN);
+            M5.Lcd.drawCircle(x + 24, y + 17, 4, GREEN);
+            M5.Lcd.drawFastHLine(x + 4, y + 17, 40, DARKGREEN);
+            M5.Lcd.drawFastVLine(x + 24, y + 1, 32, DARKGREEN);
+            M5.Lcd.drawLine(x + 24, y + 17, x + 35, y + 8, GREEN);
+            M5.Lcd.fillCircle(x + 32, y + 11, 2, RED);
             break;
         case 4:
-            M5.Lcd.drawCircle(x + 24, y + 16, 12, WHITE);
-            M5.Lcd.fillCircle(x + 24, y + 16, 4, GREEN);
-            M5.Lcd.drawFastHLine(x + 4, y + 16, 40, DARKGREY);
-            M5.Lcd.drawFastVLine(x + 24, y + 2, 28, DARKGREY);
+            M5.Lcd.drawCircle(x + 24, y + 17, 16, DARKGREY);
+            M5.Lcd.drawCircle(x + 24, y + 17, 8, WHITE);
+            M5.Lcd.drawFastHLine(x + 2, y + 17, 44, DARKGREY);
+            M5.Lcd.drawFastVLine(x + 24, y + 1, 32, DARKGREY);
+            M5.Lcd.fillCircle(x + 24, y + 17, 4, GREEN);
+            M5.Lcd.drawRect(x + 6, y + 2, 36, 30, DARKCYAN);
             break;
         case 5:
-            M5.Lcd.fillCircle(x + 24, y + 12, 8, YELLOW);
-            M5.Lcd.fillRect(x + 20, y + 18, 8, 8, DARKGREY);
-            M5.Lcd.drawFastHLine(x + 21, y + 27, 6, WHITE);
+            M5.Lcd.fillRect(x + 8, y + 14, 20, 8, DARKGREY);
+            M5.Lcd.drawRect(x + 8, y + 14, 20, 8, WHITE);
+            M5.Lcd.fillRect(x + 28, y + 10, 8, 16, DARKCYAN);
+            M5.Lcd.drawRect(x + 28, y + 10, 8, 16, CYAN);
+            M5.Lcd.drawLine(x + 36, y + 10, x + 46, y + 4, YELLOW);
+            M5.Lcd.drawLine(x + 36, y + 18, x + 48, y + 18, YELLOW);
+            M5.Lcd.drawLine(x + 36, y + 26, x + 46, y + 32, YELLOW);
             break;
         case 6:
-            M5.Lcd.fillRect(x + 10, y + 12, 8, 8, GREEN);
-            M5.Lcd.fillRect(x + 18, y + 12, 8, 8, GREEN);
-            M5.Lcd.fillRect(x + 26, y + 12, 8, 8, GREEN);
-            M5.Lcd.fillRect(x + 26, y + 4, 8, 8, GREEN);
-            M5.Lcd.fillRect(x + 36, y + 4, 4, 4, RED);
+            M5.Lcd.fillRect(x + 4, y + 4, 40, 26, 0x4208);
+            M5.Lcd.drawRect(x + 4, y + 4, 40, 26, WHITE);
+            M5.Lcd.fillRect(x + 8, y + 8, 20, 14, BLACK);
+            M5.Lcd.fillRect(x + 10, y + 14, 4, 4, GREEN);
+            M5.Lcd.fillRect(x + 14, y + 14, 4, 4, GREEN);
+            M5.Lcd.fillRect(x + 18, y + 14, 4, 4, GREEN);
+            M5.Lcd.fillRect(x + 22, y + 10, 4, 4, RED);
+            M5.Lcd.fillCircle(x + 35, y + 12, 3, RED);
+            M5.Lcd.fillCircle(x + 39, y + 18, 3, YELLOW);
             break;
     }
 }
@@ -183,7 +235,7 @@ void renderCarouselUI() {
     M5.Lcd.setTextColor(WHITE, NAVY);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setCursor(5, 5);
-    M5.Lcd.print("StickZero OS v5.0");
+    M5.Lcd.print("StickZero OS v5.1");
 
     M5.Lcd.setCursor(170, 5);
     M5.Lcd.printf("BAT:%d%%", getBatteryPercent());
