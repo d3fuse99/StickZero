@@ -14,6 +14,7 @@ bool isPowerSave = false;
 void handleCarouselSelect() {
     switch (currentAppIndex) {
         case 0:
+            initPcController();
             currentMenu = MENU_PC;
             selectedIndex = 0;
             renderPcMenuUI();
@@ -21,14 +22,14 @@ void handleCarouselSelect() {
         case 1:
             showStatus("IR: TV-B-Gone...", CYAN, BLACK);
             sendFullTvBGone();
-            showStatus("IR: All TVs Sent!", GREEN, BLACK);
+            showStatus("IR: 5x TV Burst Sent!", GREEN, BLACK);
             renderCarouselUI();
             break;
         case 2:
             showStatus("IR: AC-B-Gone...", CYAN, BLACK);
             sendSenseiAcPower();
             sendAcUniversal();
-            showStatus("IR: All ACs Sent!", GREEN, BLACK);
+            showStatus("IR: 5x AC Burst Sent!", GREEN, BLACK);
             renderCarouselUI();
             break;
         case 3:
@@ -76,6 +77,7 @@ void handlePcMenuSelect() {
         }
         renderPcMenuUI();
     } else if (selectedIndex == 3) {
+        deinitPcController();
         currentMenu = MENU_CAROUSEL;
         renderCarouselUI();
     }
@@ -103,7 +105,6 @@ void setup() {
     }
 
     initIrController();
-    initPcController();
 
     lastActivity = millis();
     renderCarouselUI();
