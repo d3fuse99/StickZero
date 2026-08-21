@@ -6,6 +6,10 @@ void initPcController() {
     bleKeyboard.begin();
 }
 
+void deinitPcController() {
+    bleKeyboard.end();
+}
+
 void pcShutdownBle() {
     if (!bleKeyboard.isConnected()) return;
     bleKeyboard.press(KEY_LEFT_GUI);
