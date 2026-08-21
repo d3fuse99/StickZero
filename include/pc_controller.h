@@ -4,6 +4,7 @@
 
 extern BleKeyboard bleKeyboard;
 void initPcController();
+void deinitPcController();
 void pcShutdownBle();
 void pcLockScreen();
 void pcMuteAudio();
