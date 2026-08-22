@@ -1,6 +1,8 @@
 #include "radar.h"
 
 void startBleRadar() {
+    BLEDevice::init("StickZero OS");
+
     M5.Lcd.fillScreen(BLACK);
     M5.Lcd.fillRect(0, 0, 240, 18, NAVY);
     M5.Lcd.setTextColor(WHITE, NAVY);
@@ -60,10 +62,10 @@ void startBleRadar() {
     M5.Lcd.setCursor(10, 123);
     M5.Lcd.println("Press [A] or [B] to Exit");
 
-    delay(300);
+    delay(200);
     while (true) {
         M5.update();
         if (M5.BtnB.wasPressed() || M5.BtnA.wasPressed()) break;
-        delay(30);
+        delay(20);
     }
 }
