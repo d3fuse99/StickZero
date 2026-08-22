@@ -31,8 +31,10 @@ int getBatteryPercent() {
 
 void setPowerSave(bool enable) {
     if (enable) {
+        setCpuFrequencyMhz(20);
         M5.Axp.SetLDO2(false);
     } else {
+        setCpuFrequencyMhz(80);
         M5.Axp.SetLDO2(true);
         M5.Axp.ScreenBreath(18);
     }
@@ -46,7 +48,7 @@ void initDisplay() {
 
 void shuffleArray(int* arr, int n) {
     for (int i = n - 1; i > 0; i--) {
-        int j = random(0, i + 1);
+        int j = esp_random() % (i + 1);
         int t = arr[i];
         arr[i] = arr[j];
         arr[j] = t;
@@ -58,7 +60,7 @@ bool checkPinLock() {
     int enteredPin[4] = {0, 0, 0, 0};
     int gridNumbers[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-    randomSeed(millis());
+    randomSeed(analogRead(36) + esp_random());
     shuffleArray(gridNumbers, 10);
 
     int cursorIndex = 0;
@@ -128,7 +130,7 @@ bool checkPinLock() {
                 step++;
                 break;
             }
-            delay(30);
+            delay(20);
         }
     }
 
@@ -143,7 +145,7 @@ bool checkPinLock() {
         M5.Lcd.setTextSize(2);
         M5.Lcd.setCursor(35, 55);
         M5.Lcd.println("ACCESS GRANTED");
-        delay(500);
+        delay(400);
         return true;
     } else {
         M5.Lcd.fillScreen(RED);
@@ -151,7 +153,7 @@ bool checkPinLock() {
         M5.Lcd.setTextSize(2);
         M5.Lcd.setCursor(35, 55);
         M5.Lcd.println("ACCESS DENIED");
-        delay(1200);
+        delay(1000);
         return false;
     }
 }
@@ -235,7 +237,7 @@ void renderCarouselUI() {
     M5.Lcd.setTextColor(WHITE, NAVY);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setCursor(5, 5);
-    M5.Lcd.print("StickZero OS v5.1");
+    M5.Lcd.print("StickZero OS v5.2");
 
     M5.Lcd.setCursor(170, 5);
     M5.Lcd.printf("BAT:%d%%", getBatteryPercent());
