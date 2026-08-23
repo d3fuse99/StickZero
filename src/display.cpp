@@ -29,6 +29,22 @@ int getBatteryPercent() {
     return (int)((vbat - 3.2) * 100.0 / 0.9);
 }
 
+void drawBatteryIndicator(int x, int y) {
+    int bat = getBatteryPercent();
+
+    M5.Lcd.drawRect(x, y + 2, 22, 11, WHITE);
+    M5.Lcd.fillRect(x + 22, y + 5, 2, 5, WHITE);
+
+    int barW = map(constrain(bat, 0, 100), 0, 100, 0, 18);
+    uint16_t color = (bat > 40) ? GREEN : (bat > 15) ? YELLOW : RED;
+    M5.Lcd.fillRect(x + 2, y + 4, barW, 7, color);
+
+    M5.Lcd.setTextColor(WHITE, NAVY);
+    M5.Lcd.setTextSize(1);
+    M5.Lcd.setCursor(x - 30, y + 4);
+    M5.Lcd.printf("%d%%", bat);
+}
+
 void setPowerSave(bool enable) {
     if (enable) {
         setCpuFrequencyMhz(20);
@@ -95,8 +111,7 @@ bool checkPinLock() {
         M5.Lcd.println("[B] Move");
         M5.Lcd.setCursor(6, 95);
         M5.Lcd.println("[A] Enter");
-        M5.Lcd.setCursor(6, 115);
-        M5.Lcd.printf("BAT:%d%%", getBatteryPercent());
+        drawBatteryIndicator(68, 112);
 
         for (int i = 0; i < 10; i++) {
             int x = gridX[i];
@@ -236,19 +251,18 @@ void renderCarouselUI() {
     M5.Lcd.fillRect(0, 0, 240, 18, NAVY);
     M5.Lcd.setTextColor(WHITE, NAVY);
     M5.Lcd.setTextSize(1);
-    M5.Lcd.setCursor(5, 5);
-    M5.Lcd.print("StickZero OS v5.2");
+    M5.Lcd.setCursor(6, 5);
+    M5.Lcd.print("StickZero");
 
-    M5.Lcd.setCursor(170, 5);
-    M5.Lcd.printf("BAT:%d%%", getBatteryPercent());
+    drawBatteryIndicator(212, 1);
 
     int cardX = 35;
     int cardY = 24;
     int cardW = 170;
     int cardH = 78;
 
-    M5.Lcd.fillRect(cardX, cardY, cardW, cardH, DARKCYAN);
-    M5.Lcd.drawRect(cardX, cardY, cardW, cardH, CYAN);
+    M5.Lcd.fillRoundRect(cardX, cardY, cardW, cardH, 8, DARKCYAN);
+    M5.Lcd.drawRoundRect(cardX, cardY, cardW, cardH, 8, CYAN);
 
     drawAppIcon(cardX + 61, cardY + 8, currentAppIndex);
 
@@ -282,14 +296,16 @@ void renderPcMenuUI() {
     M5.Lcd.fillRect(0, 0, 240, 18, NAVY);
     M5.Lcd.setTextColor(WHITE, NAVY);
     M5.Lcd.setTextSize(1);
-    M5.Lcd.setCursor(5, 5);
+    M5.Lcd.setCursor(6, 5);
     M5.Lcd.print("StickZero > PC Remote");
+
+    drawBatteryIndicator(212, 1);
 
     for (int i = 0; i < 4; i++) {
         int y = 24 + (i * 22);
         if (i == selectedIndex) {
-            M5.Lcd.fillRect(0, y, 240, 20, DARKCYAN);
-            M5.Lcd.drawRect(0, y, 240, 20, CYAN);
+            M5.Lcd.fillRoundRect(0, y, 240, 20, 4, DARKCYAN);
+            M5.Lcd.drawRoundRect(0, y, 240, 20, 4, CYAN);
             M5.Lcd.setTextColor(YELLOW, DARKCYAN);
             M5.Lcd.setTextSize(2);
             M5.Lcd.setCursor(5, y + 2);
