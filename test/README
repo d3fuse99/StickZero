@@ -1,41 +1,56 @@
 **StickZero**
 
-A modular multi-tool firmware for M5StickC PLUS powered by ESP32.
+A hardened, modular multi-tool operating firmware for M5StickC PLUS powered by ESP32.
 
-**Project Status: Release v3.3**
-Enhanced with Sensei AC support, Flashlight Mode, PC Audio Mute (BLE), Full TV-B-Gone (KIVI+All), Snake Game, and optimized power management.
+**Project Status: Production Release**
+Engineered with a randomized 3x4 anti-spy security keypad, Bruce-style carousel UI with pixel art, Cyber-Beaver bootloader, 5x IR overdrive, and deep battery power management.
 
 ---
 
-**Features (v3.3)**
-* **Bruce-Style Multi-Window GUI**: Categorized submenu navigation (`PC Remote`, `TV Remote`, `AC Remote`, `Flashlight`, `Snake Game`) with real-time battery percentage indicator (AXP192).
-* **Language-Independent PC Control**: Hardware-level Windows 10/11 shutdown (`Win+X` -> `u` -> `u`), screen lock (`Win+L`), and audio mute (`KEY_MEDIA_MUTE`) via Bluetooth HID.
-* **Full TV-B-Gone & KIVI Support**: Comprehensive IR power-toggle burst for KIVI, Samsung, LG, Sony, Panasonic, Philips, Toshiba, and TCL TVs.
-* **Sensei & Universal AC Remote**: Dedicated payload generator for Sensei AC units alongside major climate brands (Gree, Coolix, Midea, Daikin, Haier, LG, Samsung, Panasonic, Mitsubishi).
-* **Pocket Flashlight Mode**: Full-screen 100% white display brightness paired with on-board red LED (GPIO 10) illumination.
-* **Retro Snake Game**: Interactive mini-game designed for the 240x135 LCD with score tracking.
-* **Deep Power Saver**: Display backlight power rail (`LDO2`) completely shuts off after 10 seconds of inactivity to preserve battery life.
+**Core Features**
+* **Anti-Spy Keypad Matrix**: 3x4 smartphone-style PIN keypad with true hardware entropy (`esp_random()`) shuffling digit slot positions on every boot (`7-9-2-4` master code). Prevents click-counting and shoulder-surfing.
+* **Bruce-Style Carousel GUI**: Horizontal card slider featuring custom high-resolution pixel art icons, graphical battery gauge (AXP192), and dot indicators.
+* **Ultra-Low Power Management**: CPU dynamically scales down to 20 MHz in idle mode, screen backlight power rail (`LDO2`) completely cuts off after 10 seconds of inactivity, and wake-up clicks strictly restore the display without accidental command triggers.
+* **On-Demand BLE Radio**: Bluetooth stack initializes strictly within the PC Remote module and terminates upon exiting, eliminating background battery drain.
+* **5x IR Signal Overdrive**: High-density 5-cycle packet bursts with 20ms micro-intervals for KIVI, Samsung, LG, Sony, Panasonic, Philips, Toshiba TVs and Sensei/Universal AC units, delivering reliable 4–6m range.
+* **Cyber-Beaver Bootloader**: Flipper-Zero-inspired animated pixel-art cyber-beaver with core loading progress.
+* **Language-Independent PC Control**: Hardware-level Windows 10/11 shutdown (`Win+X` -> `u` -> `u`), screen lock (`Win+L`), and audio mute (`KEY_MEDIA_MUTE`) via Bluetooth HID profile.
+* **BLE Proximity Radar**: Live circular Bluetooth locator scanning surrounding devices with real-time RSSI signal levels and distance estimation in meters.
+* **Digital IMU Bubble Level**: Precision 6-axis surface leveling tool utilizing on-board MPU6886 accelerometer with visual `[LEVEL OK]` alignment detection.
+* **Multi-Mode Strobe & Light**: Instant white flashlight (100% brightness + red LED), SOS Morse code beacon (`... --- ...`), and rapid Police Flasher with instant non-blocking button exit.
+* **Retro Snake Game**: Built-in interactive mini-game with score tracking.
 
 ---
 
 **Hardware Requirements**
-* **Target Board**: M5StickC PLUS (ESP32-PICO-D4, ST7789 display 135x240 px).
+* **Target Board**: M5StickC PLUS (ESP32-PICO-D4, ST7789 display 135x240 px, MPU6886 IMU, AXP192 PMU).
 
 ---
 
 **Project Structure**
-* `include/display.h` / `src/display.cpp` — GUI rendering, menu state machine, flashlight, battery metering.
-* `include/pc_controller.h` / `src/pc_controller.cpp` — Bluetooth HID shortcuts (Shutdown, Lock, Mute).
-* `include/ir_controller.h` / `src/ir_controller.cpp` — TV (KIVI, Samsung, LG, Sony) and AC (Sensei, Universal) IR drivers.
-* `include/game.h` / `src/game.cpp` — Built-in Snake game engine.
-* `src/main.cpp` — Event loop & hardware orchestration.
+* `include/beaver.h` / `src/beaver.cpp` — Cyber-Beaver bootloader & pixel sprite renderer.
+* `include/display.h` / `src/display.cpp` — Bruce carousel GUI, high-res pixel icons, Anti-Spy 3x4 PIN matrix, power management.
+* `include/pc_controller.h` / `src/pc_controller.cpp` — On-demand Bluetooth HID shortcuts (Shutdown, Lock, Mute).
+* `include/ir_controller.h` / `src/ir_controller.cpp` — 5x overdrive TV-B-Gone and AC-B-Gone IR transmission drivers.
+* `include/radar.h` / `src/radar.cpp` — BLE Proximity Radar & distance estimator.
+* `include/imu_level.h` / `src/imu_level.cpp` — 6-axis MPU6886 digital bubble level.
+* `include/flashlight.h` / `src/flashlight.cpp` — Solid flashlight, SOS Morse, and Police Strobe.
+* `include/game.h` / `src/game.cpp` — Snake game engine.
+* `src/main.cpp` — Event loop, sleep orchestrator & app router.
 
 ---
 
 **Build & Installation**
 1. Open workspace in **VS Code** with **PlatformIO** extension.
-2. Build & Upload:
+2. Target board in `platformio.ini`: `board = m5stick-c`.
+3. Build & Upload:
    `pio run --target upload`
+
+---
+
+**Security & Access**
+* **Default Master PIN**: `7 - 9 - 2 - 4`
+* Navigate the randomized 3x4 keypad using button **B** and confirm each digit with button **A**.
 
 ---
 
