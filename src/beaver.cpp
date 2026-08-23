@@ -43,16 +43,12 @@ void showCyberBeaverBoot() {
         M5.Lcd.fillRect(0, 85, 240, 50, BLACK);
 
         M5.Lcd.setTextColor(CYAN, BLACK);
-        M5.Lcd.setTextSize(1);
-        M5.Lcd.setCursor(65, 88);
-        M5.Lcd.println("STICKZERO OS v5.0");
+        M5.Lcd.setTextSize(2);
+        M5.Lcd.setCursor(68, 86);
+        M5.Lcd.println("StickZero");
 
-        M5.Lcd.drawRect(30, 102, 180, 10, WHITE);
-        M5.Lcd.fillRect(32, 104, (int)(i * 1.76), 6, GREEN);
-
-        M5.Lcd.setTextColor(DARKGREY, BLACK);
-        M5.Lcd.setCursor(85, 118);
-        M5.Lcd.printf("Loading %d%%", i);
+        M5.Lcd.drawRect(30, 104, 180, 8, WHITE);
+        M5.Lcd.fillRect(32, 106, (int)(i * 1.76), 4, GREEN);
 
         delay(15);
     }
