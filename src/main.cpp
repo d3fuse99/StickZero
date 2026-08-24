@@ -7,6 +7,7 @@
 #include "imu_level.h"
 #include "flashlight.h"
 #include "game.h"
+#include "gallery.h"
 
 uint32_t lastActivity = 0;
 bool isPowerSave = false;
@@ -46,6 +47,10 @@ void handleCarouselSelect() {
             break;
         case 6:
             startSnakeGame();
+            renderCarouselUI();
+            break;
+        case 7:
+            startGallery();
             renderCarouselUI();
             break;
     }
@@ -124,7 +129,7 @@ void loop() {
         } else {
             resetSleepTimer();
             if (currentMenu == MENU_CAROUSEL) {
-                currentAppIndex = (currentAppIndex + 1) % 7;
+                currentAppIndex = (currentAppIndex + 1) % 8;
                 renderCarouselUI();
             } else {
                 selectedIndex = (selectedIndex + 1) % 4;
