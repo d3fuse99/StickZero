@@ -4,7 +4,7 @@ MenuState currentMenu = MENU_CAROUSEL;
 int currentAppIndex = 0;
 int selectedIndex = 0;
 
-const int kTotalApps = 7;
+const int kTotalApps = 8;
 const char* appTitles[kTotalApps] = {
     "PC REMOTE",
     "TV-B-GONE",
@@ -12,7 +12,8 @@ const char* appTitles[kTotalApps] = {
     "BLE RADAR",
     "IMU LEVEL",
     "FLASHLIGHT",
-    "SNAKE GAME"
+    "SNAKE GAME",
+    "GALLERY"
 };
 
 const char* pcItems[] = {
@@ -242,6 +243,12 @@ void drawAppIcon(int x, int y, int index) {
             M5.Lcd.fillCircle(x + 35, y + 12, 3, RED);
             M5.Lcd.fillCircle(x + 39, y + 18, 3, YELLOW);
             break;
+        case 7:
+            M5.Lcd.drawRect(x + 6, y + 4, 36, 26, WHITE);
+            M5.Lcd.fillRect(x + 9, y + 7, 30, 20, DARKCYAN);
+            M5.Lcd.fillCircle(x + 16, y + 13, 3, YELLOW);
+            M5.Lcd.fillTriangle(x + 10, y + 26, x + 24, y + 15, x + 38, y + 26, MAGENTA);
+            break;
     }
 }
 
@@ -273,7 +280,7 @@ void renderCarouselUI() {
     M5.Lcd.print(appTitles[currentAppIndex]);
 
     for (int i = 0; i < kTotalApps; i++) {
-        int dotX = 75 + (i * 14);
+        int dotX = 70 + (i * 13);
         int dotY = 108;
         if (i == currentAppIndex) {
             M5.Lcd.fillCircle(dotX, dotY, 4, CYAN);
