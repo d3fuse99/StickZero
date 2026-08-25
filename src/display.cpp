@@ -3,8 +3,10 @@
 MenuState currentMenu = MENU_CAROUSEL;
 int currentAppIndex = 0;
 int selectedIndex = 0;
+int selectedDeauthIndex = 0;
+int selectedJammerIndex = 0;
 
-const int kTotalApps = 8;
+const int kTotalApps = 10;
 const char* appTitles[kTotalApps] = {
     "PC REMOTE",
     "TV-B-GONE",
@@ -13,13 +15,27 @@ const char* appTitles[kTotalApps] = {
     "IMU LEVEL",
     "FLASHLIGHT",
     "SNAKE GAME",
-    "GALLERY"
+    "GALLERY",
+    "WI-FI KILLER",
+    "BT JAMMER"
 };
 
 const char* pcItems[] = {
     "1. PC Shutdown (BLE)",
     "2. PC Lock (BLE)",
     "3. Mute Audio (BLE)",
+    "< Back"
+};
+
+const char* deauthItems[] = {
+    "1. Start Attack",
+    "2. Stop Attack",
+    "< Back"
+};
+
+const char* jammerItems[] = {
+    "1. Start Jamming",
+    "2. Stop Jamming",
     "< Back"
 };
 
@@ -32,14 +48,11 @@ int getBatteryPercent() {
 
 void drawBatteryIndicator(int x, int y) {
     int bat = getBatteryPercent();
-
     M5.Lcd.drawRect(x, y + 2, 22, 11, WHITE);
     M5.Lcd.fillRect(x + 22, y + 5, 2, 5, WHITE);
-
     int barW = map(constrain(bat, 0, 100), 0, 100, 0, 18);
     uint16_t color = (bat > 40) ? GREEN : (bat > 15) ? YELLOW : RED;
     M5.Lcd.fillRect(x + 2, y + 4, barW, 7, color);
-
     M5.Lcd.setTextColor(WHITE, NAVY);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setCursor(x - 30, y + 4);
@@ -76,19 +89,15 @@ bool checkPinLock() {
     int targetPin[4] = {7, 9, 2, 4};
     int enteredPin[4] = {0, 0, 0, 0};
     int gridNumbers[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-
     randomSeed(analogRead(36) + esp_random());
     shuffleArray(gridNumbers, 10);
-
     int cursorIndex = 0;
     int step = 0;
-
     int gridX[10] = {105, 150, 195, 105, 150, 195, 105, 150, 195, 150};
-    int gridY[10] = {  8,   8,   8,  38,  38,  38,  68,  68,  68,  98};
+    int gridY[10] = {8, 8, 8, 38, 38, 38, 68, 68, 68, 98};
 
     while (step < 4) {
         M5.Lcd.fillScreen(BLACK);
-
         M5.Lcd.fillRect(0, 0, 95, 135, NAVY);
         M5.Lcd.setTextColor(WHITE, NAVY);
         M5.Lcd.setTextSize(1);
@@ -118,7 +127,6 @@ bool checkPinLock() {
             int x = gridX[i];
             int y = gridY[i];
             int val = gridNumbers[i];
-
             if (i == cursorIndex) {
                 M5.Lcd.fillRoundRect(x, y, 38, 26, 6, YELLOW);
                 M5.Lcd.setTextColor(BLACK, YELLOW);
@@ -249,36 +257,45 @@ void drawAppIcon(int x, int y, int index) {
             M5.Lcd.fillCircle(x + 16, y + 13, 3, YELLOW);
             M5.Lcd.fillTriangle(x + 10, y + 26, x + 24, y + 15, x + 38, y + 26, MAGENTA);
             break;
+        case 8:
+            M5.Lcd.drawRect(x + 6, y + 4, 36, 26, RED);
+            M5.Lcd.fillRect(x + 9, y + 7, 30, 20, BLACK);
+            M5.Lcd.drawLine(x + 12, y + 12, x + 32, y + 22, GREEN);
+            M5.Lcd.drawLine(x + 32, y + 12, x + 12, y + 22, GREEN);
+            M5.Lcd.drawCircle(x + 22, y + 17, 6, RED);
+            break;
+        case 9:
+            M5.Lcd.drawRect(x + 6, y + 4, 36, 26, BLUE);
+            M5.Lcd.fillRect(x + 9, y + 7, 30, 20, BLACK);
+            M5.Lcd.fillCircle(x + 16, y + 13, 3, CYAN);
+            M5.Lcd.fillCircle(x + 28, y + 13, 3, CYAN);
+            M5.Lcd.drawLine(x + 14, y + 20, x + 22, y + 26, CYAN);
+            M5.Lcd.drawLine(x + 30, y + 20, x + 22, y + 26, CYAN);
+            M5.Lcd.drawLine(x + 14, y + 20, x + 30, y + 20, CYAN);
+            break;
     }
 }
 
 void renderCarouselUI() {
     M5.Lcd.fillScreen(BLACK);
-
     M5.Lcd.fillRect(0, 0, 240, 18, NAVY);
     M5.Lcd.setTextColor(WHITE, NAVY);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setCursor(6, 5);
     M5.Lcd.print("StickZero");
-
     drawBatteryIndicator(212, 1);
-
     int cardX = 35;
     int cardY = 24;
     int cardW = 170;
     int cardH = 78;
-
     M5.Lcd.fillRoundRect(cardX, cardY, cardW, cardH, 8, DARKCYAN);
     M5.Lcd.drawRoundRect(cardX, cardY, cardW, cardH, 8, CYAN);
-
     drawAppIcon(cardX + 61, cardY + 8, currentAppIndex);
-
     M5.Lcd.setTextColor(YELLOW, DARKCYAN);
     M5.Lcd.setTextSize(2);
     int textLen = strlen(appTitles[currentAppIndex]) * 12;
     M5.Lcd.setCursor(cardX + (cardW - textLen) / 2, cardY + 50);
     M5.Lcd.print(appTitles[currentAppIndex]);
-
     for (int i = 0; i < kTotalApps; i++) {
         int dotX = 70 + (i * 13);
         int dotY = 108;
@@ -288,7 +305,6 @@ void renderCarouselUI() {
             M5.Lcd.fillCircle(dotX, dotY, 2, DARKGREY);
         }
     }
-
     M5.Lcd.fillRect(0, 118, 240, 17, BLACK);
     M5.Lcd.drawFastHLine(0, 117, 240, DARKCYAN);
     M5.Lcd.setTextColor(WHITE, BLACK);
@@ -299,15 +315,12 @@ void renderCarouselUI() {
 
 void renderPcMenuUI() {
     M5.Lcd.fillScreen(BLACK);
-
     M5.Lcd.fillRect(0, 0, 240, 18, NAVY);
     M5.Lcd.setTextColor(WHITE, NAVY);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setCursor(6, 5);
     M5.Lcd.print("StickZero > PC Remote");
-
     drawBatteryIndicator(212, 1);
-
     for (int i = 0; i < 4; i++) {
         int y = 24 + (i * 22);
         if (i == selectedIndex) {
@@ -324,7 +337,6 @@ void renderPcMenuUI() {
             M5.Lcd.println(pcItems[i]);
         }
     }
-
     M5.Lcd.fillRect(0, 118, 240, 17, BLACK);
     M5.Lcd.drawFastHLine(0, 117, 240, DARKCYAN);
     M5.Lcd.setTextColor(DARKGREY, BLACK);
