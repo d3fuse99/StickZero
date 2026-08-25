@@ -8,6 +8,13 @@
 #include "flashlight.h"
 #include "game.h"
 #include "gallery.h"
+#include "deauth_controller.h"
+#include "jammer_controller.h"
+
+void handleDeauthMenuSelect();
+void handleJammerMenuSelect();
+bool deauthRunning = false;
+bool jammerRunning = false;
 
 uint32_t lastActivity = 0;
 bool isPowerSave = false;
@@ -53,6 +60,16 @@ void handleCarouselSelect() {
             startGallery();
             renderCarouselUI();
             break;
+        case 8:
+            currentMenu = MENU_DEAUTH;
+            selectedDeauthIndex = 0;
+            renderDeauthUI();
+            break;
+        case 9:
+            currentMenu = MENU_JAMMER;
+            selectedJammerIndex = 0;
+            renderJammerUI();
+            break;            
     }
 }
 
@@ -88,13 +105,75 @@ void handlePcMenuSelect() {
     }
 }
 
+void handleDeauthMenuSelect() {
+    if (selectedDeauthIndex == 0) {
+        if (!deauthRunning) {
+            initDeauth();
+            startDeauthAttack();
+            deauthRunning = true;
+            showStatus("Deauth: STARTED", GREEN, BLACK);
+        } else {
+            showStatus("Already running", YELLOW, BLACK);
+        }
+        renderDeauthUI();
+    } else if (selectedDeauthIndex == 1) {
+        if (deauthRunning) {
+            stopDeauthAttack();
+            deauthRunning = false;
+            showStatus("Deauth: STOPPED", RED, WHITE);
+        } else {
+            showStatus("Not running", YELLOW, BLACK);
+        }
+        renderDeauthUI();
+    } else if (selectedDeauthIndex == 2) {
+        if (deauthRunning) {
+            stopDeauthAttack();
+            deauthRunning = false;
+        }
+        currentMenu = MENU_CAROUSEL;
+        renderCarouselUI();
+    }
+}
+
+void handleJammerMenuSelect() {
+    if (selectedJammerIndex == 0) {
+        if (!jammerRunning) {
+            initJammer();
+            startJammer();
+            jammerRunning = true;
+            showStatus("Jammer: STARTED", GREEN, BLACK);
+        } else {
+            showStatus("Already running", YELLOW, BLACK);
+        }
+        renderJammerUI();
+    } else if (selectedJammerIndex == 1) {
+        if (jammerRunning) {
+            stopJammer();
+            jammerRunning = false;
+            showStatus("Jammer: STOPPED", RED, WHITE);
+        } else {
+            showStatus("Not running", YELLOW, BLACK);
+        }
+        renderJammerUI();
+    } else if (selectedJammerIndex == 2) {
+        if (jammerRunning) {
+            stopJammer();
+            jammerRunning = false;
+        }
+        currentMenu = MENU_CAROUSEL;
+        renderCarouselUI();
+    }
+}
+
 void resetSleepTimer() {
     lastActivity = millis();
     if (isPowerSave) {
         setPowerSave(false);
         isPowerSave = false;
         if (currentMenu == MENU_CAROUSEL) renderCarouselUI();
-        else renderPcMenuUI();
+        else if (currentMenu == MENU_PC) renderPcMenuUI();
+        else if (currentMenu == MENU_DEAUTH) renderDeauthUI();
+        else if (currentMenu == MENU_JAMMER) renderJammerUI();
     }
 }
 
@@ -118,6 +197,13 @@ void setup() {
 void loop() {
     M5.update();
 
+    if (deauthRunning) {
+        loopDeauth();
+    }
+    if (jammerRunning) {
+        loopJammer();
+    }
+
     if (millis() - lastActivity > 10000 && !isPowerSave) {
         setPowerSave(true);
         isPowerSave = true;
@@ -129,11 +215,17 @@ void loop() {
         } else {
             resetSleepTimer();
             if (currentMenu == MENU_CAROUSEL) {
-                currentAppIndex = (currentAppIndex + 1) % 8;
+                currentAppIndex = (currentAppIndex + 1) % 10;
                 renderCarouselUI();
-            } else {
+            } else if (currentMenu == MENU_PC) {
                 selectedIndex = (selectedIndex + 1) % 4;
                 renderPcMenuUI();
+            } else if (currentMenu == MENU_DEAUTH) {
+                selectedDeauthIndex = (selectedDeauthIndex + 1) % 3;
+                renderDeauthUI();
+            } else if (currentMenu == MENU_JAMMER) {
+                selectedJammerIndex = (selectedJammerIndex + 1) % 3;
+                renderJammerUI();
             }
         }
     }
@@ -145,8 +237,12 @@ void loop() {
             resetSleepTimer();
             if (currentMenu == MENU_CAROUSEL) {
                 handleCarouselSelect();
-            } else {
+            } else if (currentMenu == MENU_PC) {
                 handlePcMenuSelect();
+            } else if (currentMenu == MENU_DEAUTH) {
+                handleDeauthMenuSelect();
+            } else if (currentMenu == MENU_JAMMER) {
+                handleJammerMenuSelect();
             }
         }
     }
