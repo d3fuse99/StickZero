@@ -1,0 +1,17 @@
+.pio
+.vscode
+*.o
+*.d
+*.elf
+*.bin
+*.jpg
+*.jpeg
+*.png
+photo*.jpg
+__pycache__/
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.tmp
+*.swp
