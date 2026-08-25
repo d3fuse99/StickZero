@@ -1,5 +1,7 @@
 # StickZero
+## ⚠️ LEGAL DISCLAIMER
 
+This software is provided for educational purposes only. The authors are not responsible for any misuse, damage, or legal consequences resulting from the use of this software. Users are solely responsible for complying with all applicable laws and regulations in their jurisdiction.
 A hardened, modular multi-tool operating firmware for M5StickC PLUS powered by ESP32.
 
 **Project Status:** Production Release Engineered with an 8-app Bruce-style carousel OS, customized RGB565 photogallery engine, hardware-randomized 3x4 anti-spy security matrix, 5x IR overdrive, and deep battery power management.
